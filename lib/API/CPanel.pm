@@ -19,7 +19,7 @@ use API::CPanel::Package;
 
 our @EXPORT      = qw/get_auth_hash refs is_success query_abstract is_ok get_error/;
 our @EXPORT_OK   = qw//;
-our $VERSION     = 0.03;
+our $VERSION     = 0.04;
 our $DEBUG       = '';
 our $FAKE_ANSWER = '';
 

@@ -7,9 +7,10 @@ WriteMakefile(
     VERSION_FROM      => 'lib/API/CPanel.pm',
     PREREQ_PM         => {
         'Exporter::Lite' => '0',
-        'Crypt::SSLeay'  => '0',
         'XML::Simple'    => '0',
         'Getopt::Long'   => '0',
+        'LWP::UserAgent' => '0',
+        'Data::Dumper'   => '0',
     },
     ($] >= 5.005 ?     ## Add these new keywords supported since 5.005
       (ABSTRACT_FROM  => 'lib/API/CPanel.pm', # retrieve abstract from module
