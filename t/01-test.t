@@ -17,7 +17,7 @@ BEGIN {
 
 my $manipulate_user = 'zsezse';
 
-use Test::More tests => $ONLINE ? 54 : 54;
+use Test::More tests => $ONLINE ? 55 : 55;
 
 my $test_host = $ENV{host} || '127.0.0.1';
 
@@ -656,7 +656,47 @@ $result = API::CPanel::User::list(
 	%correct_params,
     }
 );
-ok( ref $result eq 'ARRAY' && scalar @$result, 'API::CPanel::User::list');
+ok( ref $result eq 'HASH' && scalar %$result, 'API::CPanel::User::list');
+
+
+$API::CPanel::FAKE_ANSWER = ! $ONLINE ? <<THEEND : undef;
+<listaccts>
+  <acct>
+    <disklimit>unlimited</disklimit>
+    <diskused>0M</diskused>
+    <domain>qewqe.ru</domain>
+    <email>*unknown*</email>
+    <ip>192.168.123.208</ip>
+    <maxaddons>*unknown*</maxaddons>
+    <maxftp>unlimited</maxftp>
+    <maxlst>unlimited</maxlst>
+    <maxparked>*unknown*</maxparked>
+    <maxpop>unlimited</maxpop>
+    <maxsql>unlimited</maxsql>
+    <maxsub>unlimited</maxsub>
+    <owner>root</owner>
+    <partition>home</partition>
+    <plan>default</plan>
+    <shell>/bin/bash</shell>
+    <startdate>10 Mar 22 16:18</startdate>
+    <suspended>0</suspended>
+    <suspendreason>not suspended</suspendreason>
+    <suspendtime></suspendtime>
+    <theme>x3</theme>
+    <unix_startdate>1269249522</unix_startdate>
+    <user>qewqeru</user>
+  </acct>
+  <status>1</status>
+  <statusmsg>Ok</statusmsg>
+</listaccts>
+THEEND
+
+$result = API::CPanel::User::list_simple(
+    {
+	%correct_params,
+    }
+);
+ok( ref $result eq 'ARRAY' && scalar @$result, 'API::CPanel::User::list_simple');
 
 $API::CPanel::FAKE_ANSWER = ! $ONLINE ? <<THEEND : undef;
 <restartservice>

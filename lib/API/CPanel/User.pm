@@ -10,6 +10,18 @@ use Data::Dumper;
 sub list {
     my $params = shift;
 
+    return API::CPanel::fetch_hash_abstract(
+	params       => $params,
+	func         => 'listaccts',
+	container    => 'acct',
+	key_field    => 'user',
+    );
+}
+
+# Возвращает список пользователей (возвращает массив, только имена пользователей)
+sub list_simple {
+    my $params = shift;
+
     return API::CPanel::fetch_array_abstract(
 	params       => $params,
 	func         => 'listaccts',

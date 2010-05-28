@@ -15,11 +15,12 @@ use API::CPanel::Ip;
 use API::CPanel::User;
 use API::CPanel::Misc;
 use API::CPanel::Package;
+use API::CPanel::Domain;
 
 
 our @EXPORT      = qw/get_auth_hash refs is_success query_abstract is_ok get_error/;
 our @EXPORT_OK   = qw//;
-our $VERSION     = 0.04;
+our $VERSION     = 0.06;
 our $DEBUG       = '';
 our $FAKE_ANSWER = '';
 
@@ -383,10 +384,12 @@ sub query_abstract {
 	    return $server_answer;
 	}
         else {
+            $API::CPanel::last_answer = $server_answer;
 	    warn "wrong server answer" if $DEBUG;
 	    return '';
         };
     } else {
+        $API::CPanel::last_answer = 'auth_hash not found';
         warn "auth_hash not found" if $DEBUG;
         return '';
     }
@@ -418,13 +421,35 @@ sub fetch_array_abstract {
 	container      => $params{container},
 	allowed_fields => $params{allowed_fields},
     );
-    return $result_list unless $result && ref $result eq 'ARRAY';
+    return $result_list  unless $result;
+    $result = [ $result ] if ref $result ne 'ARRAY';
 
     foreach my $elem ( @{ $result } ) {
 	push @$result_list, $result_field ? $elem->{$result_field} : $elem;
     };
 
     return $result_list;
+}
+
+# Abstract sub for fetch hash
+sub fetch_hash_abstract {
+    my %params = @_;
+
+    my $result = query_abstract(
+	params         => $params{params},
+	func           => $params{func},
+	container      => $params{container},
+	allowed_fields => $params{allowed_fields},
+    );
+
+    my $result_hash = {};
+    return $result_hash unless $params{key_field};
+    my $key_field   = $params{key_field};
+    foreach my $each ( @$result ) { 
+        $result_hash->{$each->{$key_field}} = $each;
+    }
+
+    return $result_hash;
 }
 
 1;

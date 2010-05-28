@@ -1,6 +1,6 @@
 --- #YAML:1.0
 name:               API-CPanel
-version:            0.04
+version:            0.06
 abstract:           interface to the CPanel Hosting Panel API ( http://cpanel.net )
 author:
     - Konstantin Vlasov <knvlasov@reg.ru>
