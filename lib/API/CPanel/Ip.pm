@@ -6,6 +6,7 @@ use warnings;
 use API::CPanel;
 use Data::Dumper;
 
+our $VERSION = 0.07;
 
 # Возвращает список ip адресов
 sub list {

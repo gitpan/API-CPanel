@@ -9,15 +9,15 @@ use Data::Dumper;
 our $ONLINE;
 
 BEGIN {
-    #$ENV{auth_user} = 'u0720435';
-    #$ENV{auth_passwd} = 'zsezsezse';
-    #$ENV{host} = '192.168.123.208';
+    #$ENV{auth_user}   = 'reseller';
+    #$ENV{auth_passwd} = '11111';
+    #$ENV{host}        = '192.168.123.1';
     $ONLINE = $ENV{auth_user} && $ENV{auth_passwd} && $ENV{host};
 }
 
 my $manipulate_user = 'zsezse';
 
-use Test::More tests => $ONLINE ? 55 : 55;
+use Test::More tests => $ONLINE ? 58 : 58;
 
 my $test_host = $ENV{host} || '127.0.0.1';
 
@@ -118,6 +118,9 @@ my %correct_params = (
     host        => $test_host,
 
 );
+
+
+
 
 $API::CPanel::FAKE_ANSWER = ! $ONLINE ? <<THEEND : undef;
 <listips>
@@ -998,4 +1001,90 @@ $result = API::CPanel::Ip::remove(
 is( $result, 1, 'API::CPanel::Ip::remove');
 
 #diag Dumper( $result );
+
+# Mysql тесты
+
+$API::CPanel::FAKE_ANSWER = ! $ONLINE ? <<THEEND : undef;
+<?xml version="1.0" ?>
+<cpanelresult>
+    <module>Mysql</module>
+    <func>adduser</func>
+    <type>event</type>
+    <source>internal</source>
+    <apiversion>1</apiversion>
+    <data>
+        <result></result>
+    </data>
+    <event>
+        <result>1</result>
+     </event>
+</cpanelresult>
+THEEND
+
+$result = API::CPanel::Mysql::adduser(
+    {
+        %correct_params,
+        do_as_user => 'zsezse5',
+        username   => 'test13',
+        password   => 'test13pass',
+    }
+);
+is( $result, 1, 'API::CPanel::Mysql::adduser');
+
+$API::CPanel::FAKE_ANSWER = ! $ONLINE ? <<THEEND : undef;
+<?xml version="1.0" ?>
+<cpanelresult>
+    <module>Mysql</module>
+    <func>adddb</func>
+    <type>event</type>
+    <source>internal</source>
+    <apiversion>1</apiversion>
+    <data>
+        <result></result>
+    </data>
+    <event>
+        <result>1</result>
+    </event>
+</cpanelresult>
+THEEND
+
+$result = API::CPanel::Mysql::adddb(
+    {
+        %correct_params,
+        do_as_user => 'zsezse5',
+        dbname     => 'default',
+    }
+);
+is( $result, 1, 'API::CPanel::Mysql::adddb');
+
+
+$API::CPanel::FAKE_ANSWER = ! $ONLINE ? <<THEEND : undef;
+<?xml version="1.0" ?>
+<cpanelresult>
+    <module>Mysql</module>
+    <func>adduserdb</func>
+    <type>event</type>
+    <source>internal</source>
+    <apiversion>1</apiversion>
+    <data>
+        <result></result>
+    </data>
+    <event>
+        <result>1</result>
+    </event>
+</cpanelresult>
+THEEND
+
+$result = API::CPanel::Mysql::grant_perms(
+    {
+        %correct_params,
+        do_as_user => 'zsezse5',
+        dbname     => 'zsezse5_default',
+        dbuser     => 'zsezse5_test13',
+        perms_list => 'all',
+    }
+);
+is( $result, 1, 'API::CPanel::Mysql::grant_perms');
+
+
 

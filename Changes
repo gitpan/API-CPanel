@@ -9,4 +9,9 @@ Revision history for Perl extension API::CPanel.
 	- add fetch_hash_abstract function
 	- add Domain module
         - fixed Bug #57646 for API-CPanel: Error when XML::Simple don't create arrays in fetch_array_abstract
+0.07  Wed Jun 09 18:23:28 2010
+        - add Mysql module
+        - add Mysql::adduser
+        - add Mysql::adddb
+        - add Mysql::grant_perms
 

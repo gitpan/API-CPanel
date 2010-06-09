@@ -16,11 +16,12 @@ use API::CPanel::User;
 use API::CPanel::Misc;
 use API::CPanel::Package;
 use API::CPanel::Domain;
+use API::CPanel::Mysql;
 
 
 our @EXPORT      = qw/get_auth_hash refs is_success query_abstract is_ok get_error/;
 our @EXPORT_OK   = qw//;
-our $VERSION     = 0.06;
+our $VERSION     = 0.07;
 our $DEBUG       = '';
 our $FAKE_ANSWER = '';
 
