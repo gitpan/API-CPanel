@@ -21,7 +21,7 @@ use API::CPanel::Mysql;
 
 our @EXPORT      = qw/get_auth_hash refs is_success query_abstract is_ok get_error/;
 our @EXPORT_OK   = qw//;
-our $VERSION     = 0.07;
+our $VERSION     = 0.08;
 our $DEBUG       = '';
 our $FAKE_ANSWER = '';
 
@@ -317,6 +317,7 @@ sub refs {
 # STATIC(data_block)
 sub is_success {
     my $data_block = shift;
+    my $want_hash  = shift;
 
     if ( $data_block &&
          ref $data_block eq 'HASH' &&
@@ -327,7 +328,7 @@ sub is_success {
        ) {
         return 1;
     } else {
-        return '';
+        return $want_hash ? {} : '';
     }
 }
 
@@ -407,7 +408,7 @@ sub action_abstract {
 	allowed_fields => $params{allowed_fields},
     );
 
-    return $params{want_hash} ? $result : is_success( $result );
+    return $params{want_hash} && is_success( $result, $params{want_hash} ) ? $result : is_success( $result );
 }
 
 # Abstract sub for fetch arrays

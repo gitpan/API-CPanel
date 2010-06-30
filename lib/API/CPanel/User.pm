@@ -6,7 +6,7 @@ use warnings;
 use API::CPanel;
 use Data::Dumper;
 
-our $VERSION = 0.07;
+our $VERSION = 0.08;
 
 # Возвращает список пользователей
 sub list {
@@ -89,6 +89,7 @@ sub create {
 	params         => $params,
 	func           => 'createacct',
 	container      => 'result',
+	want_hash      => $params->{want_hash},
 	allowed_fields =>
 	   'username
 	    domain

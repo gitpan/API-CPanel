@@ -9,15 +9,15 @@ use Data::Dumper;
 our $ONLINE;
 
 BEGIN {
-    #$ENV{auth_user}   = 'reseller';
-    #$ENV{auth_passwd} = '11111';
+    #$ENV{auth_user}   = 'restest';
+    #$ENV{auth_passwd} = '123';
     #$ENV{host}        = '192.168.123.1';
     $ONLINE = $ENV{auth_user} && $ENV{auth_passwd} && $ENV{host};
 }
 
 my $manipulate_user = 'zsezse';
 
-use Test::More tests => $ONLINE ? 58 : 58;
+use Test::More tests => $ONLINE ? 60 : 60;
 
 my $test_host = $ENV{host} || '127.0.0.1';
 
@@ -167,6 +167,7 @@ my $ip_list = API::CPanel::Ip::list(
     }
 );
 
+my $main_shared_ip = $ip_list->[0];
 #diag "Get ips from panel: " . Dumper( $ip_list ) . scalar @$ip_list;
 ok($ip_list && ref $ip_list eq 'ARRAY' && scalar @$ip_list, 'API::CPanel::Ip::list');
 #$API::CPanel::DEBUG=0;
@@ -256,6 +257,7 @@ Ftp vhost passwords synced
   </passwd>
 </passwd>
 THEEND
+
 
 $result = API::CPanel::User::change_account_password(
     {
@@ -913,6 +915,83 @@ $result = API::CPanel::Package::remove(
 
 is( $result, 1, 'API::CPanel::Package::remove');
 
+# тест добавления IP и смены осн. IP сайта
+
+$API::CPanel::FAKE_ANSWER = ! $ONLINE ? <<THEEND : undef;
+<addip>
+  <addip>
+      <msgs>eth0:4 is now up.  192.168.123.150/255.255.255.0 broadcast 192.168.123.255 has been added
+      System has 1 free ip.</msgs>
+      <status>1</status>
+      <statusmsg>Success</statusmsg>
+  </addip>
+</addip>
+THEEND
+
+
+$result = API::CPanel::Ip::add(
+    {
+	%correct_params,
+	ip      => '192.168.123.150',
+	netmask => '255.255.255.0',
+    }
+);
+is( $result, 1, 'API::CPanel::Ip::add');
+
+$API::CPanel::FAKE_ANSWER = ! $ONLINE ? <<THEEND : undef;
+<setsiteip>
+  <result>
+      <status>1</status>
+      <statusmsg></statusmsg>
+  </result>
+</setsiteip>
+THEEND
+
+$result = API::CPanel::Domain::change_site_ip(
+    {
+        %correct_params,
+        ip      => '192.168.123.150',
+        user    => $manipulate_user,
+    }
+);
+is( $result, 1, 'API::CPanel::Domain::change_site_ip');
+
+
+$API::CPanel::FAKE_ANSWER = ! $ONLINE ? <<THEEND : undef;
+<setsiteip>
+  <result>
+      <status>1</status>
+      <statusmsg></statusmsg>
+  </result>
+</setsiteip>
+THEEND
+
+$result = API::CPanel::Domain::change_site_ip(
+    {
+        %correct_params,
+        ip      => $main_shared_ip,
+        user    => $manipulate_user,
+    }
+);
+is( $result, 1, 'API::CPanel::Domain::change_site_ip to main_shared_ip');
+
+$API::CPanel::FAKE_ANSWER = ! $ONLINE ? <<THEEND : undef;
+<delip>
+  <delip>
+      <status>1</status>
+      <statusmsg>eth0:4 is now down, 192.168.123.150 has been removed</statusmsg>
+  </delip>
+</delip>
+THEEND
+
+$result = API::CPanel::Ip::remove(
+    {
+	%correct_params,
+	ip => '192.168.123.150',
+    }
+);
+is( $result, 1, 'API::CPanel::Ip::remove');
+
 $API::CPanel::FAKE_ANSWER = ! $ONLINE ? <<THEEND : undef;
 <removeacct>
   <result>
@@ -962,43 +1041,6 @@ $result = API::CPanel::User::delete(
 );
 is( $result, '', 'API::CPanel::User::delete repeat');
 
-$API::CPanel::FAKE_ANSWER = ! $ONLINE ? <<THEEND : undef;
-<addip>
-  <addip>
-      <msgs>eth0:4 is now up.  192.168.123.150/255.255.255.0 broadcast 192.168.123.255 has been added
-      System has 1 free ip.</msgs>
-      <status>1</status>
-      <statusmsg>Success</statusmsg>
-  </addip>
-</addip>
-THEEND
-
-
-$result = API::CPanel::Ip::add(
-    {
-	%correct_params,
-	ip      => '192.168.123.150',
-	netmask => '255.255.255.0',
-    }
-);
-is( $result, 1, 'API::CPanel::Ip::add');
-
-$API::CPanel::FAKE_ANSWER = ! $ONLINE ? <<THEEND : undef;
-<delip>
-  <delip>
-      <status>1</status>
-      <statusmsg>eth0:4 is now down, 192.168.123.150 has been removed</statusmsg>
-  </delip>
-</delip>
-THEEND
-
-$result = API::CPanel::Ip::remove(
-    {
-	%correct_params,
-	ip => '192.168.123.150',
-    }
-);
-is( $result, 1, 'API::CPanel::Ip::remove');
 
 #diag Dumper( $result );
 
@@ -1085,6 +1127,4 @@ $result = API::CPanel::Mysql::grant_perms(
     }
 );
 is( $result, 1, 'API::CPanel::Mysql::grant_perms');
-
-
 

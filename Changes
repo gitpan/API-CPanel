@@ -14,4 +14,6 @@ Revision history for Perl extension API::CPanel.
         - add Mysql::adduser
         - add Mysql::adddb
         - add Mysql::grant_perms
-
+0.08  Tue Jun 22 13:09:04 2010
+        - little fix action_abstract
+        - add Domain:change_site_ip
