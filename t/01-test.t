@@ -17,7 +17,7 @@ BEGIN {
 
 my $manipulate_user = 'zsezse';
 
-use Test::More tests => $ONLINE ? 60 : 60;
+use Test::More tests => $ONLINE ? 61 : 61;
 
 my $test_host = $ENV{host} || '127.0.0.1';
 
@@ -1127,4 +1127,36 @@ $result = API::CPanel::Mysql::grant_perms(
     }
 );
 is( $result, 1, 'API::CPanel::Mysql::grant_perms');
+
+$API::CPanel::FAKE_ANSWER = ! $ONLINE ? <<THEEND : undef;
+<?xml version="1.0" ?>
+<cpanelresult>
+  <apiversion>2</apiversion>
+  <data>
+    <reason>
+         aaaaa.asdasd.ru was successfully parked on top of aaaaa.x
+    </reason>
+    <result>1</result>
+  </data>
+  <event>
+    <result>1</result>
+  </event>
+  <func>addaddondomain</func>
+  <module>AddonDomain</module>
+</cpanelresult>
+THEEND
+
+my $addondomain = 'ssssss.ru';
+my $subdomain = 'ssssss';
+$result = API::CPanel::Domain::add_addon_domain(
+    {
+        %correct_params,
+        do_as_user      => 'zsezse5',
+        dir             => "public_html/$addondomain",
+        newdomain       => $addondomain,
+        pass            => 'asdsadasdsad',
+        subdomain       => $subdomain,
+    }
+);
+is( $result->{data}->{result}, 1 , 'API::CPanel::Domain::add_addon_domain');
 

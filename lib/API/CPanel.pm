@@ -21,7 +21,7 @@ use API::CPanel::Mysql;
 
 our @EXPORT      = qw/get_auth_hash refs is_success query_abstract is_ok get_error/;
 our @EXPORT_OK   = qw//;
-our $VERSION     = 0.08;
+our $VERSION     = 0.09;
 our $DEBUG       = '';
 our $FAKE_ANSWER = '';
 
